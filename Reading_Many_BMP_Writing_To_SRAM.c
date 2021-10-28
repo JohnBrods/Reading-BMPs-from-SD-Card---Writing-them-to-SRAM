@@ -3800,9 +3800,6 @@ void main(){
               StartingClusterData27 = dataBuffer[File.Location[File_Number]+27];
               StartingClusterData26 = dataBuffer[File.Location[File_Number]+26];
               File.Starting_Cluster[File_Number] = (StartingClusterData27<<8) | StartingClusterData26;
-             //for(x=0; x<12; x++){
-             //   File[File_Counter].name[x] = dataBuffer[File[File_Counter].Location[File_Counter]+x];
-             // }
             }
 
           }
@@ -3823,8 +3820,6 @@ void main(){
         if(dataBuffer[Location] >=65 && dataBuffer[Location] <=90){
 
          if(dataBuffer[Location+8] ==66 && dataBuffer[Location+9] ==77){
-
-             Write_Number(Location,360,ypos,Blue);
 
              Write_Number(Location,360,ypos,Blue);
              TFT_Write_Char(dataBuffer[Location],xpos,ypos);
@@ -3907,9 +3902,7 @@ void main(){
         Delay_ms(300);
       }
 
-     //loop1:
      Delay_ms(4000);
-     //goto loop1;
      
      File_Number = 8;  //<<<<<<<<<<<<<<<<<<<<<<<<<
 
@@ -3985,7 +3978,6 @@ void main(){
      TFT_CS = 1;
 
      while(Complete !=1){                   //Copy Bitmap to SRAM By John B 21th OCTOBER 2021
-         //TFT_RS = 1;   //RS = 1 = DATA   D/C = 1
          SRAM_CS = 0;
 
          PMCONbits.PMPEN = 0;    //PMP DISABLE  !
@@ -4017,14 +4009,11 @@ void main(){
              Actual_Sector[File_Number] = Actual_Sector[File_Number] -1501;
           }
         }
-
           SRAM_CS = 1;
-          //TFT_CS = 1;
-          PMCONbits.PMPEN = 1;  //PMP ENABLE  !
+          PMCONbits.PMPEN = 1;    //PMP ENABLE  !
           PMCONbits.PTWREN = 1;   //WRITE STROBE ENABLE
           PMCONbits.PTRDEN = 1;   //READ STROBE
       }
-
 
      ypos = 10;
      Write_Screen_From_SRAM(0,799,0,479);
@@ -4130,8 +4119,6 @@ void main(){
            TFT_Set_DBC_SSD1963_BACKLIGHT(220);
            savepower = 0;
          }
-        
-
 
         if(seconds%10 ==1){
           onlyonce2 = 1;
