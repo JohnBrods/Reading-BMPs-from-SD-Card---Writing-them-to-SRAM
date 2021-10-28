@@ -1083,25 +1083,23 @@ const unsigned char Number_Font_Length_Bytes = 75;
 const unsigned char Number_Font_Width = 24;      // full bytes of pixels   8,16,24,32,40 etc
 const unsigned char Number_Font_Height = 25;     //Academy_Engraved_LET16x20
 const unsigned char Number_Font_Spacing = 2;
-                                                                       //I put my original colour system back, the other had errors when I had errors.
+                                                //I put my original colour system back, the other had errors when I had errors.
 
-#define Black_Out         Write_Data_SSD1963(0b0000000000000000);
-#define Red_Out           Write_Data_SSD1963(0b1111100000000000);
-#define Orange_Out        Write_Data_SSD1963(0b1111001110000000);
-#define Yellow_Out        Write_Data_SSD1963(0b1111111111100000);
-#define Green_Out         Write_Data_SSD1963(0b0000011111100000);
-#define Blue_Out          Write_Data_SSD1963(0b0000000000010111);
-#define Violet_Out        Write_Data_SSD1963(0b1111000000011111);
-#define Olive_Out         Write_Data_SSD1963(0b0011100111100011);
-#define White_Out         Write_Data_SSD1963(0xFFFF);
-#define Magenta_Out       Write_Data_SSD1963(0b1111100100001101);
-#define Lime_Out          Write_Data_SSD1963(0b0111011111101100);
-#define Baby_Powder_Out   Write_Data_SSD1963(0b1110111010001111);
-#define Cyan_Out          Write_Data_SSD1963(0b0000011111111111);
-#define Lavenderblush_Out Write_Data_SSD1963(0b1111101111000111);
-#define Beige_Out         Write_Data_SSD1963(0b1011110000000000);
-
-
+#define Black_Out         Write_Data_SSD1963(0b0000000000000000)
+#define Red_Out           Write_Data_SSD1963(0b1111100000000000)
+#define Orange_Out        Write_Data_SSD1963(0b1111001110000000)
+#define Yellow_Out        Write_Data_SSD1963(0b1111111111100000)
+#define Green_Out         Write_Data_SSD1963(0b0000011111100000)
+#define Blue_Out          Write_Data_SSD1963(0b0000000000010111)
+#define Violet_Out        Write_Data_SSD1963(0b1111000000011111)
+#define Olive_Out         Write_Data_SSD1963(0b0011100111100011)
+#define White_Out         Write_Data_SSD1963(0xFFFF)
+#define Magenta_Out       Write_Data_SSD1963(0b1111100100001101)
+#define Lime_Out          Write_Data_SSD1963(0b0111011111101100)
+#define Baby_Powder_Out   Write_Data_SSD1963(0b1110111010001111)
+#define Cyan_Out          Write_Data_SSD1963(0b0000011111111111)
+#define Lavenderblush_Out Write_Data_SSD1963(0b1111101111000111)
+#define Beige_Out         Write_Data_SSD1963(0b1011110000000000)
 
 const unsigned char Black = 0;
 const unsigned char Red = 2;
@@ -1118,9 +1116,6 @@ const unsigned char Baby_Powder = 12;
 const unsigned char Cyan = 13;
 const unsigned char Lavenderblush = 14;
 const unsigned char Beige = 15;
-
-
-
 
 #define SRAM_CS LATJ4_Bit
 
@@ -1147,11 +1142,7 @@ sbit TFT_RD_Direction  at TRISC4_bit;    //PMRD  READ
 
 sbit TFT_WR_Direction  at TRISC3_bit;    //PMWR  WRITE  EBIWE/AN20/RPC3/PMWR/RC3
 
-sbit Mmc_Chip_Select            at LATE8_bit;
-sbit Mmc_Chip_Select_Direction at TRISE8_bit;
-
-#define  SD_Card_Chip_Select  LATE8_bit
-
+#define SD_Card_Chip_Select  LATE8_bit
 
 void Set_Index(unsigned char index) {
   TFT_RS = 0;
@@ -1171,13 +1162,11 @@ void Write_Data(unsigned int _data) {
   while(PMMODE & 0x8000); //Busy bit
 }
 
-
 void Write_Command_SSD1963(unsigned char Command) {
   TFT_RS = 0;  //RS = 0 NOT DATA  D/C = 0
   PMDOUT = Command;
   while(PMMODE & 0x8000); //Busy bit
 }
-
 
 void Write_Data_SSD1963(unsigned int _data) {
   TFT_RS = 1;   //RS = 1 = DATA   D/C = 1
@@ -1214,10 +1203,7 @@ void TFT_Set_DBC_SSD1963_BACKLIGHT(unsigned char value) {  //PAGE54
   TFT_CS = 1;
 }
 
-
-
 void TFT_SET_MODE_SSD1963_5_Inch(){  // & newer 7"            Page 84 for timing
-
 
       TFT_CS_Direction = 0;
       TFT_RST_Direction = 0;
@@ -1234,7 +1220,6 @@ void TFT_SET_MODE_SSD1963_5_Inch(){  // & newer 7"            Page 84 for timing
 
       Write_Command_SSD1963(0x01);   //Software Reset
       Delay_ms(10);                  //The Host Processor Must Wait 5ms Before Sending Any New Commands
-
 
       Write_Command_SSD1963(0xE2);   // SET PLL
       Write_Data_SSD1963(32);        // MULTIPLIER 10 MHz BASE CLOCK x
@@ -1376,7 +1361,6 @@ static void Init_MCU() {
    JTAGEN_bit = 0;
 }
 
-
 unsigned short seconds10s;
 unsigned short seconds1s;
 unsigned short minutes1s;
@@ -1397,7 +1381,6 @@ unsigned short date;
 unsigned short weekday;
 unsigned short months;
 unsigned short years;
-
 
 char minutes1str[4];
 char minutes10str[4];
@@ -1486,17 +1469,13 @@ void Clear_Screen_SSD1963(unsigned int Colour){
                  Write_Data_SSD1963(Colour);
                  } break;
     }
-
     TFT_CS = 1;
-  //  return Background_Colour;
 }
-
-
 
 unsigned int Pixel;
 void Get_Pixel_Colour(unsigned int Colour){
 
-    switch (Colour)  {
+    switch(Colour)  {
 
      case 0:     Pixel = 0x00;
                  break;
@@ -1534,7 +1513,7 @@ void Get_Pixel_Colour(unsigned int Colour){
                  break;
     }
 
-    switch (Background_Colour)  {
+    switch(Background_Colour)  {
 
      case 0:     Background_Colour = 0x00;
                  break;
@@ -2501,7 +2480,6 @@ void Write_Number(unsigned long num,unsigned int X_Position,unsigned int Y_Posit
     }}
 }
 
-
 ////////////////////////////////////////////////////////////////////////////////    “little-endian”   Least Significant Number first !!  //////////////////////////////////////
 
 //Offset |   Size    | Description           Implementing File I/O Functions Using Microchip’s Memory Disk Drive File System Library  AN1045
@@ -2771,7 +2749,6 @@ void Set_DMA_Increment_EBI(){
     DCH0SSA  = address;     //: Transfer Source Physical Address  this works
 
     DCH0DSA  = SRAM_ADDRESS & 0x2FFFFFFF;   //:DESTINATION Address THIS WORKS TO INCREMENT EBI    //   destAddress = ((destAddress | 0x20000000) & 0x2FFFFFFF);
-    //DCH0DSA =  address;
 
     DCH0DSIZ = 2;           //:Channel Destination Size Bytes Register
 
@@ -2782,7 +2759,6 @@ void Set_DMA_Increment_EBI(){
     CHAEN_bit = 1;       //: Channel Automatic Enable bit  Channel is continuously enabled
 
     IEC4SET = 0 | 0x40;    //Enable DMA channel interrupts
-
 }
 
 
@@ -2822,7 +2798,7 @@ void Write_Screen_From_SRAM(unsigned int Start_Column, unsigned int End_Column, 
     Write_Command_SSD1963(0x2C);   // Write Memory Start, 0x2C
     Write_Data_SSD1963(0x2C);   // Write Memory Start, 0x2C  9.30 Write Memory Continue    Command 0x3C
 
-    PMCONbits.PTWREN = 0;   //WRITE STROBE ENABLE
+    PMCONbits.PTWREN = 0;      //WRITE STROBE ENABLE
 
     for (j=1; j<384001; j++){
       PMDOUT = dummybuffer;
