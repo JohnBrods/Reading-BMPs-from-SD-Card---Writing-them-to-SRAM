@@ -10,14 +10,14 @@
                                                     OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
                                                     ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
                                                     OTHER DEALINGS IN THE SOFTWARE.*/
-                                                    //Read bitmap from sd card, up to 12.
+                                                    //Read Bitmap From Sd Card, Up To 12. Automatic
                                                     //Write it to SRAM
                                                     //Show Bitmap
                                                     //All automatic file reading. John B 27/10/2021
 
 
 //GLCD FontName : Academy_Engraved_LET143x181
-//GLCD FontSize : 143 x 181                              (Academy_Engraved_LET121x183_Regular,CL_White,FO_HORIZONTAL);
+//GLCD FontSize : 143 x 181
 
 const unsigned short Academy_Engraved_LET121x183_Regular[] = {    //ACTUALLY 143 x 181  Academy_Engraved_LET143x183[] = {
    0x00,
@@ -2900,8 +2900,6 @@ void Small_Part_Screen_Capture(unsigned int Start_Column, unsigned int End_Colum
       PMMODEbits.WAITM = 1;
 }
 
-
-
 void Show_Time(unsigned char yy){
 
 unsigned char DateString[6];
@@ -2909,11 +2907,10 @@ unsigned char *monthtext;
 
     if(minutes%10==0){
      Write_Screen_From_SRAM(0,799,0,479);
-
-    //  Small_Part_Screen_Capture(Small_Part_Capture_Start_Column,Part_Capture_End_Column,Part_Capture_Start_Row,Part_Capture_End_Row);
+     //Small_Part_Screen_Capture(Small_Part_Capture_Start_Column,Part_Capture_End_Column,Part_Capture_Start_Row,Part_Capture_End_Row);
     }else {
       Write_Screen_From_SRAM(0,799,0,479);
-    //  Small_Write_Screen(Small_Part_Capture_Start_Column,Part_Capture_End_Column,Part_Capture_Start_Row,Part_Capture_End_Row);
+     //Small_Write_Screen(Small_Part_Capture_Start_Column,Part_Capture_End_Column,Part_Capture_Start_Row,Part_Capture_End_Row);
     }
 
     switch (months) {
@@ -3022,49 +3019,6 @@ void Poll_DMA(){
      }
 }
 
-void SRAM_Screen_Capture(unsigned int Start_Column, unsigned int End_Column, unsigned int Start_Row, unsigned int End_Row){
-
-    unsigned long j = 0;
-    TFT_CS = 0;
-    SRAM_CS = 0;
-
-    Write_Command_SSD1963(0x2A);           //: Set Start Column               D/C = 0;
-    Write_Data_SSD1963(Start_column>>8);   //: Start Column Number High Byte  D/C = 1;
-    Write_Data_SSD1963(Start_column);      //: Start Column Number Low Byte   D/C = 1;
-    Write_Data_SSD1963(End_Column>>8);     //: End Column Number High Byte    D/C = 1;
-    Write_Data_SSD1963(End_Column);        //: End Column Number Low Byte     D/C = 1;
-
-    Write_Command_SSD1963(0x2B);           //: SET ROW ADDRESS                D/C = 0;
-    Write_Data_SSD1963(Start_Row>>8);      //: Start Row Number High Byte     D/C = 1;
-    Write_Data_SSD1963(Start_Row);         //: Start Row Number Low Byte      D/C = 1;
-    Write_Data_SSD1963(End_Row>>8);        //: End Row Number High Byte       D/C = 1;
-    Write_Data_SSD1963(End_Row);           //: End Row Number Low Byte        D/C = 1;
-
-    Write_Command_SSD1963(0x2E);// Read Memory Start
-
-    PMMODEbits.WAITM = 3;
-    PMCONbits.PTWREN = 0;   //WRITE STROBE ENABLE
-    PMCONbits.PTRDEN = 0;   //READ STROBE ENABLE
-    LATC3_bit = 1;          //WRITE = 1 = NOT ACTIVE
-
-    for(j=0; j<384000; j++){           //  for(j=0; j<111848; j++){
-      dummybuffer = PMRDIN;
-      LATC4_bit = 0;    // READ STROBE
-      asm nop;  asm nop; asm nop;// asm nop; asm nop; asm nop;
-      LATC4_bit = 1;
-      DMA_EBI_Start_Increment(j);
-      while(PMMODE & 0x8000); //Busy bit
-     }
-
-    TFT_CS = 1;
-    DMA_EBI_Start_Increment(0);
-    SRAM_CS = 1;
-    PMMODEbits.WAITM = 1;
-    PMCONbits.PTWREN = 1;   //WRITE STROBE ENABLE
-    PMCONbits.PTRDEN = 1;   //READ STROBE ENABLE
-
-}
-
 void SRAM_Controller(){
 
     EBIMSK0bits.MEMTYPE = 0b001;
@@ -3072,18 +3026,17 @@ void SRAM_Controller(){
     //EBIMSK0bits.MEMSIZE = 0b01001;    // 01001 = 16 MB
     //EBIMSK0bits.MEMSIZE = 0b10000;    // 01000 = ?? MB      PAGE 7 EBI DATA SHEET
 
-    CFGEBIA = 0x8007FFFF;  //Mine 19  Address Lines Used  External Bus Interface Address Pin Configuration Register
-    //CFGEBIA = 0x800FFFFF;  //
+    CFGEBIA = 0x8007FFFF;    //Mine 19  Address Lines Used  External Bus Interface Address Pin Configuration Register
+    //CFGEBIA = 0x800FFFFF;
     //CFGEBIA = 0x80FFFFFF;  //24 ADDRESS LINES
 
     EBICS0 = SRAM_ADDRESS;   //MEMORY START LOCATION PAGE 74 OF EFH DATA SHEET EXTERNAL MEMORY VIA EXTERNAL BUS INTERFACE EBI    EBICSx: External Bus Interface Chip Select Register (x = 0-3)
 
-    EBISMT0 = 0x000029CA;    // for 10 ns  chip select between 50 & 100 ns sometimes 2 clocks?  Write Address Setup Time Is Zero For SRAM
+    EBISMT0 = 0x000029CA;    //for 10 ns  chip select between 50 & 100 ns sometimes 2 clocks?  Write Address Setup Time Is Zero For SRAM
 
-    EBISMCON = 0x00000000;   // 16 BIT WIDE DATA  EBISMCON: External Bus Interface Static Memory Control Register   page 10
+    EBISMCON = 0x00000000;   //16 BIT WIDE DATA  EBISMCON: External Bus Interface Static Memory Control Register   page 10
 
-    CFGEBIC = 0;          // CFGEBIA:  External Bus Interface Address Pin Configuration Register   ZERO = ALL EBI PINS ARE GENERAL USE TOO
-    //CFGEBIC = 0b00010100;      //SRAM CHIP SELECT BIT 4
+    CFGEBIC = 0;             //CFGEBIA:  External Bus Interface Address Pin Configuration Register   ZERO = ALL EBI PINS ARE GENERAL USE TOO
 }
 
 void Set_Bus_Speeds(){
@@ -3129,7 +3082,6 @@ void Set_Bus_Speeds(){
     //CFGCONbits.ECCCON = 3;
 
     SYSKEY = 0x00;
-
 }
 
 void InitialiseSlowSPI(unsigned int Speed)                               //bus speed = 112'000'000
@@ -3141,7 +3093,6 @@ void InitialiseFastSPI(unsigned char Speed)
 {
   SPI3_Init_Advanced(_SPI_MASTER, _SPI_8_BIT, Speed, _SPI_SS_DISABLE, _SPI_DATA_SAMPLE_MIDDLE, _SPI_CLK_IDLE_HIGH, _SPI_ACTIVE_2_IDLE);
 }
-
 
                                            // Definitions for MMC/SD CARD command
 #define CMD0   (64 + 0)                    // Software Reset Command
@@ -3429,25 +3380,6 @@ void Initialise_SDCARD(){
       Delay_ms(1500);
 }
 
-
-
-void New_Screen(unsigned char yy){
-
-    TFT_Ext_Image(0,0,(0x00000138)+(768006)*yy ,1);   //reads res file
-
-    Delay_ms(50);
-
-    SRAM_Screen_Capture(0,799,0,479);
-
-    Write_Screen_From_SRAM(0,799,0,479);
-
-    Small_Part_Screen_Capture(Small_Part_Capture_Start_Column,Part_Capture_End_Column,Part_Capture_Start_Row,Part_Capture_End_Row);
-
-    Show_Time(yy);
-
-}
-
-
 unsigned char dataBuffer[512];   // SECTOR BUFFER
 unsigned long Address2;
 void Read_Sector(unsigned long Address){
@@ -3489,7 +3421,6 @@ void Read_Sector(unsigned long Address){
       if(Counter >5){
          Clear_Screen_SSD1963(Red);
          TFT_Write_Text("SD   Card   Error   READ   SECTOR   CMD  16  IN    READ    SECTOR",2,200);
-         TFT_Write_Text("Error   Number  = ",2,120);
          Delay_ms(400);
        }
        goto loop16;
@@ -3815,7 +3746,7 @@ void main(){
       Read_Sector(Sector);          //<<<<<<<<<<<<<<<<<<READ ROOT DIRECTORY TO VIEW FILES<<<<<<<<<
 
     /*Clear_Screen_SSD1963(Lavenderblush);
-      TFT_Write_Char(dataBuffer[0],xpos,ypos);       //display sdcard name
+      TFT_Write_Char(dataBuffer[0],xpos,ypos);       //DISPLAY SDCARD NAME
       TFT_Write_Char(dataBuffer[1],xpos*2,ypos);
       TFT_Write_Char(dataBuffer[2],xpos*3,ypos);
       TFT_Write_Char(dataBuffer[3],xpos*4,ypos);
@@ -4054,9 +3985,9 @@ void main(){
      TFT_CS = 1;
 
      while(Complete !=1){                   //Copy Bitmap to SRAM By John B 21th OCTOBER 2021
-         TFT_RS = 1;   //RS = 1 = DATA   D/C = 1
+         //TFT_RS = 1;   //RS = 1 = DATA   D/C = 1
          SRAM_CS = 0;
-        //TFT_CS = 0;
+
          PMCONbits.PMPEN = 0;    //PMP DISABLE  !
          PMCONbits.PTWREN = 0;   //WRITE STROBE
          PMCONbits.PTRDEN = 0;   //READ STROBE
@@ -4065,7 +3996,7 @@ void main(){
             Read_Sector(512 * Actual_Sector[File_Number]);
          for(x = Image_Data_Starts_At; x<Max_Bytes; x=x+2){
 
-           //Blue_Byte = dataBuffer[x] &(0xF8);
+           //Blue_Byte = dataBuffer[x] &(0xF8);            This Commented Out Section Is Me Trying To Convert 24 Bit Bitmaps To 16 Bit.
            //Green_Byte = dataBuffer[x+1] &0xFC;
            //Red_Byte = dataBuffer[x+2] &0xF8;
            //Colour_Out = (Red_Byte<<8);
@@ -4075,17 +4006,9 @@ void main(){
 
            Data_Out = dataBuffer[x] | dataBuffer[x+1]<<8;
            // Write_Data_SSD1963(Data_Out);
-           Write_Data_To_SRAM(Data_Out);  //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-
-           /*PMDOUT = dataBuffer[x] | dataBuffer[x+1]<<8;
-           LATC4_bit = 0;             //READ STROBE
-           asm nop; asm nop; asm nop; //Minimum 3 @ 224 MHz
-           LATC4_bit = 1;             //READ STROBE
-           DMA_EBI_Start_Increment(j);
-           j++;*/
+           Write_Data_To_SRAM(Data_Out);  //<<<<<<<<<<<<<<<<<<<<<THIS SECTION DOES NOT USE PMDOUT.  To Use The Port Pins, You Have To Disable The Parallel Master Port
           }
            Actual_Sector[File_Number]++;
-           // Actual_Sector++;
            Image_Data_Starts_At = 0;
 
          if(i==Sectors_To_Read-1){
@@ -4107,9 +4030,9 @@ void main(){
      Write_Screen_From_SRAM(0,799,0,479);
      Delay_ms(2000);
 
-     loop1:
-     File_Number = File_Number;  ///////////////////////////
-   //  File_Number = 2;  //<<<<<<<<<<<<<<<<<<<<<<<<<
+     //loop1:   //YOUTUBE DEMO
+     //File_Number = File_Number;  ////////////YOUTUBE DEMO///////////////
+     File_Number = 1;  //<<<<<<<<<<<<<<<<<<<<<<<<<
 
      Image_Data_Starts_At = 70;
      Bytes_Left_To_Read = 72;
@@ -4126,7 +4049,7 @@ void main(){
         Read_Sector(512*Actual_Sector[File_Number]);
        for(x = Image_Data_Starts_At; x<Max_Bytes; x=x+2){
 
-         PMDOUT = dataBuffer[x] | dataBuffer[x+1]<<8;
+         PMDOUT = dataBuffer[x] | dataBuffer[x+1]<<8;       //PMDOUT Is A Special Function Register (sfr)
          LATC4_bit = 0;             //READ STROBE
          asm nop; asm nop; asm nop; //Minimum 3 @ 224 MHz
          LATC4_bit = 1;             //READ STROBE
@@ -4150,19 +4073,20 @@ void main(){
       Delay_ms(2000);
      
       Write_Screen_From_SRAM(0,799,0,479);
-      Small_Part_Screen_Capture(Small_Part_Capture_Start_Column,Part_Capture_End_Column,Part_Capture_Start_Row,Part_Capture_End_Row);
+      
+      //Small_Part_Screen_Capture(Small_Part_Capture_Start_Column,Part_Capture_End_Column,Part_Capture_Start_Row,Part_Capture_End_Row);
       //Delay_ms(2000);
    
-      //Show_Time(yy);
+      Show_Time(yy);
      // File_Number++;
     
-      if(File_Number>FileCount){
+      /*if(File_Number>FileCount){    //YOUTUBE DEMO
          File_Number=1;
-       }
+       }*/
     
-     // goto loop1;
-
-      PointerToSector = Actual_Sector[8];
+     // goto loop1;     //YOUTUBE DEMO
+      File_Number = 10;
+      PointerToSector = Actual_Sector[11];
 
   while(1){
 
@@ -4188,12 +4112,13 @@ void main(){
 
         if(seconds ==30 && onlyonce2){
            onlyonce2 = 0;
-           PointerToSector = Actual_Sector[File_Number];
-           File_Number++;
           if(File_Number >FileCount){
              File_Number = 1;
            }
+           Write_Number(File_Number,1,10,White);
+           PointerToSector = Actual_Sector[File_Number];
            Write_New_Picture_To_SRAM(PointerToSector);
+           File_Number++;
          }
 
         if(hours==1 && savepower !=1){
@@ -4206,15 +4131,11 @@ void main(){
            savepower = 0;
          }
         
-        if(seconds ==2 && onlyoncethree){
-           onlyoncethree = 0;
-           Write_Number(File_Number,1,10,White);
-         }
+
 
         if(seconds%10 ==1){
           onlyonce2 = 1;
           onlyonce = 1;
-          onlyoncethree = 1;
           //if(File_Number==12){ yy = 12; }else {yy=0;}
          }
 
