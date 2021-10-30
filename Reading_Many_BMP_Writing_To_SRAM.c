@@ -3364,10 +3364,11 @@ void Read_Sector(unsigned long Address){
     unsigned char loop17;
     unsigned int x = 0;
     SPI3CONbits.DISSDO = 0;  //TURNS ON SERIAL DATA OUT
-
+    goto loop17;             //WE DO NOT NEED COMMAND 16 HERE. DEFAULT IS 512
+    
     loop16:
 
-    SD_Card_Chip_Select = 0;
+    /*SD_Card_Chip_Select = 0;
     SPI3_Write(CMD16);  //Command 16          read block
     SPI3_Write(0x00);
     SPI3_Write(0x00);
@@ -3381,7 +3382,8 @@ void Read_Sector(unsigned long Address){
     SD_Card_Chip_Select = 0;
     junkBufferOne[0] = SPI3_Read(dummybuffer);
     SD_Card_Chip_Select = 1;
-    asm nop;
+    asm nop;*/
+    
     //Delay_ms(1);
     ///Write_Number(junkBufferOne[0],sdcardbuffer_X_position,sdcardbuffer_Y_position+30,Black);
     //Write_Number(junkBufferOne[1],sdcardbuffer_X_position,sdcardbuffer_Y_position+60,Black);
@@ -3391,7 +3393,7 @@ void Read_Sector(unsigned long Address){
     //Write_Number(junkBufferOne[5],sdcardbuffer_X_position,sdcardbuffer_Y_position+180,Black);
     //Write_Number(16,sdcardbuffer_X_position+200,sdcardbuffer_Y_position,Black);*/
 
-    if(junkBufferOne[0] !=0){
+    /*if(junkBufferOne[0] !=0){
        Counter++;
        Delay_ms(1);
       if(Counter >5){
@@ -3400,7 +3402,7 @@ void Read_Sector(unsigned long Address){
          Delay_ms(400);
        }
        goto loop16;
-     }
+     }*/
      
     loop17:
     //Clear_Screen_SSD1963(Lavenderblush);
@@ -3464,9 +3466,9 @@ void Read_Sector(unsigned long Address){
 unsigned int x = 0;
 
 struct File_Details{
-    unsigned int  Location[13];
+    unsigned int  Location[15];
     unsigned long TotalFileSize;
-    unsigned long Starting_Cluster[13];
+    unsigned long Starting_Cluster[15];
 }File;
 
 unsigned long j = 0;
@@ -3620,7 +3622,7 @@ void main(){
       unsigned int  Sum0;
       unsigned long Sum1;
       unsigned char File_Number = 0;
-      unsigned long Actual_Sector[13];
+      unsigned long Actual_Sector[14];
       unsigned char Byte2;
       unsigned int  Byte3;
       unsigned long Byte4;
