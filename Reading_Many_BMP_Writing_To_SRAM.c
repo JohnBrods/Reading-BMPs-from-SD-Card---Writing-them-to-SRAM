@@ -3069,8 +3069,7 @@ void InitialiseFastSPI(unsigned char Speed)
 {
   SPI3_Init_Advanced(_SPI_MASTER, _SPI_8_BIT, Speed, _SPI_SS_DISABLE, _SPI_DATA_SAMPLE_MIDDLE, _SPI_CLK_IDLE_HIGH, _SPI_ACTIVE_2_IDLE);
 }
-
-                                           // Definitions for MMC/SD CARD command
+                                           // DEFINITIONS FOR MMC/SD CARD COMMANDS
 #define CMD0   (64 + 0)                    // Software Reset Command
 #define CMD1   (64 + 1)                    // Initiate initialization process.
 #define ACMD41 (64 + 41)                   // SEND_OP_COND (SDC)
@@ -3081,8 +3080,8 @@ void InitialiseFastSPI(unsigned char Speed)
 #define ACMD13 (64 + 13)                   // SD_STATUS (SDC)
 #define CMD16  (64 + 16)                   // SET SECTOR LENGTH OF BYTES YOU WANT TO READ Change R/W block size.
 #define CMD17  (64 + 17)                   // READ SINGLE SECTOR
-#define CMD18  (64 + 18)                   // READ MULTIPLE SECTORS
-#define CMD23  (64 + 23)                   // SET SECTOR COUNT For only MMC.
+#define CMD18  (64 + 18)                   // READ MULTIPLE SECTORS UNTIL INTERRUPTED BY A 'STOP TRANSMISSION' COMMAND
+#define CMD23  (64 + 23)                   // SET SECTOR COUNT / NUMBER OF BLOCKS TO READ FOR CMD18 & CMD25
 #define ACMD23 (64 + 23)                   // SET_WRITE SECTOR ERASE COUNT (SDC) For only SDC. Define number of blocks to pre-erase with next multi-block write command.
 #define CMD24  (64 + 24)                   // SET WRITE ADDRESS FOR SINGLE SECTOR
 #define CMD25  (64 + 25)                   // SET FIRST WRITE ADDRESS FOR MULTIPLE SECTORS
