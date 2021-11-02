@@ -3102,9 +3102,10 @@ void Initialise_SDCARD(){
       unsigned char HexString[4];
       unsigned char loop8;
       unsigned char loop55;
-      unsigned char loopnext;
+      unsigned char loop58;
       unsigned char loop16;
       unsigned char loop17;
+      unsigned char dummybuffer = 255;
 
       Delay_ms(200);           //TIME FOR SD CARD
 
@@ -3124,8 +3125,8 @@ void Initialise_SDCARD(){
       SPI3_Write(0xFF);        //Command Response Time (NCR).
 
       SD_Card_Chip_Select =0;
-      for(x=0; x<6; x++){
-         Boot_SectorBuffer[x] = SPI3_Read(dummybuffer);
+      for(x=0; x<4; x++){
+        Boot_SectorBuffer[x] = SPI3_Read(dummybuffer);
        }
       SD_Card_Chip_Select = 1;
       Delay_ms(10);
@@ -3134,14 +3135,15 @@ void Initialise_SDCARD(){
          Counter++;
         if(Counter >5){
           Clear_Screen_SSD1963(Red);
-          TFT_Write_Text("COMMAND   8   ERROR   Initialise_SDCARD",30,30);
+          TFT_Write_Text("COMMAND   8   ERROR   INITIALISE_SDCARD",30,30);
          }
          goto loop8;
        }
-
+       
+      SPI3CONbits.DISSDO = 0;  //TURNS ON SERIAL DATA OUT
       Counter = 0;
       loop55:
-      SPI3CONbits.DISSDO = 0;  //TURNS ON SERIAL DATA OUT
+
       SD_Card_Chip_Select = 0;
       SPI3_Write(CMD55);       //PAGE 59 OF SD CARD ASSOCIATION STATES THAT COMMAND 55 SHALL ALWAYS PRECEDE AMCD41
       SPI3_Write(0x00);
@@ -3162,42 +3164,35 @@ void Initialise_SDCARD(){
       Write_Number(dataBuffer[0],sdcardbuffer_X_position,sdcardbuffer_Y_position,White);
       Write_Number(55,sdcardbuffer_X_position+250,sdcardbuffer_Y_position,Black);
       Delay_ms(500);*/
-
-
-      //Clear_Screen_SSD1963(Lavenderblush);
+      
       SPI3CONbits.DISSDO = 0;  //TURNS ON SERIAL DATA OUT
       SD_Card_Chip_Select = 0;
-      SPI3_Write(CMD41);  //Command 41    SPI3_Write(0x69);  //Command 41      SPI3_Write(105);  ==Command 41      SPI3_Write(119); == Command 55    SPI3_Write(122);  ==Command 58
+      SPI3_Write(CMD41);  //Command 41
       SPI3_Write(0x40);
       SPI3_Write(0x00);
       SPI3_Write(0x00);
       SPI3_Write(0x00);
       SPI3_Write(0x87);        //Checksum
-      SPI3CONbits.DISSDO = 0;  //TURNS OFF SERIAL DATA OUT
-      SPI3_Write(0XFF);        //Command Response Time (NCR).
+      SPI3_Write(0XFF);        //Command Response Time
       SD_Card_Chip_Select = 1;
 
       SD_Card_Chip_Select = 0;
       Boot_SectorBuffer[0] = SPI3_Read(dummybuffer);
       SD_Card_Chip_Select = 1;
       Delay_ms(10);
-      //Write_Number(Boot_SectorBuffer[0],sdcardbuffer_X_position,sdcardbuffer_Y_position,Black);
-      //Write_Number(41,sdcardbuffer_X_position+250,sdcardbuffer_Y_position,Black);
+      /*Write_Number(Boot_SectorBuffer[0],sdcardbuffer_X_position,sdcardbuffer_Y_position,Black);
+      Write_Number(41,sdcardbuffer_X_position+250,sdcardbuffer_Y_position,Black);*/
 
-      if(Boot_SectorBuffer[0] == 0){
-         Counter = 0;
-        if(Boot_SectorBuffer[0] ==4){ goto loopnext;}
-           goto loopnext;      //GOING TO START OF CMD41 AND LOOPING WILL GIVE YOU A 5 SO GOTO 55 AGAIN
-       }else {
+      if(Boot_SectorBuffer[0] !=0){
          Counter++;
-         Delay_ms(2);
-      if(Counter >6){
-        Clear_Screen_SSD1963(Red);
-        TFT_Write_Text("COMMAND   41   ERROR   Initialise_SDCARD",30,30);
+        if(Counter >5){
+           Clear_Screen_SSD1963(Red);
+           TFT_Write_Text("COMMAND   41   ERROR   INITIALISE_SDCARD",30,30);
+         }
+        goto loop55;
        }
-        goto loop55;          }
-
-      loopnext:
+       
+      loop58:
       InitialiseFastSPI(8);  //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
       SPI3CONbits.DISSDO = 0;  //TURNS ON SERIAL DATA OUT
@@ -3209,13 +3204,13 @@ void Initialise_SDCARD(){
       SPI3_Write(0x00);
       SPI3_Write(0xFF);        //Checksum
       SPI3CONbits.DISSDO = 1;  //TURNS OFF SERIAL DATA OUT
-      SPI3_Write(0xFF);        //Command Response Time (NCR).
+      SPI3_Write(0xFF);        //Command Response Time
       SD_Card_Chip_Select = 1;
-      SPI3_Write(0xFF);        //Command Response Time (NCR).
+      SPI3_Write(0xFF);        //Command Response Time
 
       SD_Card_Chip_Select = 0;
       for(x=0; x<6; x++){
-          Boot_SectorBuffer[x] = SPI3_Read(dummybuffer);
+        Boot_SectorBuffer[x] = SPI3_Read(dummybuffer);
        }
       SD_Card_Chip_Select = 1;          //  The Lower 12 Bits In The Return Value = 0x1AA Mean That The Card Is Sdc V2 And Can Work At A Voltage Range Of Between 2.7 To 3.6
       Delay_ms(10);
@@ -3225,23 +3220,23 @@ void Initialise_SDCARD(){
          Delay_ms(1);
         if(Counter >5){
            Clear_Screen_SSD1963(Red);
-           TFT_Write_Text("COMMAND   58   ERROR   Initialise_SDCARD",30,30);
+           TFT_Write_Text("COMMAND   58   ERROR   INITIALISE_SDCARD",30,30);
          }
-        goto loopnext;
+        goto loop58;
        }
 
       loop16:  //----------------------------------------------------------------------------
 
       SPI3CONbits.DISSDO = 0;  //TURNS ON SERIAL DATA OUT
       SD_Card_Chip_Select = 0;
-      SPI3_Write(CMD16);  //Command 16          read block
+      SPI3_Write(CMD16);      //Command 16
       SPI3_Write(0x00);
       SPI3_Write(0x00);
       SPI3_Write(0x02);
       SPI3_Write(0x00);
-      SPI3_Write(0x87);      // Checksum
+      SPI3_Write(0x87);        //Checksum
       SPI3CONbits.DISSDO = 1;  //TURNS OFF SERIAL DATA OUT
-      SPI3_Write(0xFF);     // Command Response Time (NCR).
+      SPI3_Write(0xFF);        //Command Response Time
       SD_Card_Chip_Select = 1;
 
       SD_Card_Chip_Select = 0;
@@ -3254,7 +3249,7 @@ void Initialise_SDCARD(){
          Delay_ms(1);
         if(Counter >6){
           Clear_Screen_SSD1963(Red);
-          TFT_Write_Text("COMMAND   16   ERROR   Initialise_SDCARD",30,30);
+          TFT_Write_Text("COMMAND   16   ERROR   INITIALISE_SDCARD",30,30);
          }
          goto loop16;
        }
@@ -3283,7 +3278,7 @@ void Initialise_SDCARD(){
          Delay_ms(1);
         if(Counter >5){
           Clear_Screen_SSD1963(Red);
-          TFT_Write_Text("COMMAND   8   ERROR   Initialise_SDCARD",30,30);
+          TFT_Write_Text("COMMAND   8   ERROR   INITIALISE_SDCARD",30,30);
          }
          goto loop17;
        }
@@ -3309,8 +3304,8 @@ void Initialise_SDCARD(){
       sdcardbuffer_Y_position = 30;
 
       if(Boot_SectorBuffer[511] !=170){     //File Type is Wrong.
-         Clear_Screen_SSD1963(Red);
-         TFT_Write_Text("Wrong  File  Type  Set   ADJUSTING",30,30);
+         //Clear_Screen_SSD1963(Red);
+         //TFT_Write_Text("Wrong  File  Type  Set   ADJUSTING",30,30);
 
         if(Boot_SectorBuffer[512]==170){
            File_Type = File_Type +1;
@@ -3320,8 +3315,8 @@ void Initialise_SDCARD(){
        }
 
       if(Boot_SectorBuffer[511] !=170){     //File Type is Wrong.
-         Clear_Screen_SSD1963(Red);
-         TFT_Write_Text("Wrong  File  Type  Set   ADJUSTING",30,30);
+         //Clear_Screen_SSD1963(Red);
+         //TFT_Write_Text("Wrong  File  Type  Set   ADJUSTING",30,30);
          
         if(Boot_SectorBuffer[510]==170){
           File_Type = File_Type -1;
@@ -3362,10 +3357,12 @@ void Read_Sector(unsigned long Address){
     unsigned char loop16;
     unsigned char loop17;
     unsigned int x = 0;
+    unsigned char dummybuffer = 255;
     SPI3CONbits.DISSDO = 0;  //TURNS ON SERIAL DATA OUT
-    goto loop17;             //WE DO NOT NEED COMMAND 16 HERE. DEFAULT IS 512
+
+    //goto loop17;             //WE DO NOT NEED COMMAND 16 HERE. DEFAULT IS 512
     
-    loop16:
+    //loop16:
 
     /*SD_Card_Chip_Select = 0;
     SPI3_Write(CMD16);  //Command 16          read block
@@ -3445,15 +3442,15 @@ void Read_Sector(unsigned long Address){
     SD_Card_Chip_Select = 0;
 
     for(x=0; x<File_Type; x++){
-       junkBufferOne[x] = SPI3_Read(255);
+       junkBufferOne[x] = SPI3_Read(dummybuffer);
      }
 
     for(x=0; x<512; x++){
-       dataBuffer[x] = SPI3_Read(255);     //<<<<<<<<<<<<<<DATA BUFFER HERE
+       dataBuffer[x] = SPI3_Read(dummybuffer);     //<<<<<<<<<<<<<<DATA BUFFER HERE
      }
 
     for(x=0; x<2; x++){
-       junkBufferTwo[x] = SPI3_Read(255);
+       junkBufferTwo[x] = SPI3_Read(dummybuffer);
      }
 
     SD_Card_Chip_Select = 1;
